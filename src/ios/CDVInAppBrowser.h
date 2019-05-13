@@ -70,6 +70,7 @@
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
 @property (nonatomic, assign) BOOL transparentbg;
+@property (nonatomic, assign) BOOL hidetoolbar;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 

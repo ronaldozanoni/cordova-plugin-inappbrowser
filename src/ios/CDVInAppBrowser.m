@@ -673,7 +673,10 @@
         self.view.backgroundColor = [UIColor grayColor];
     }
 
-    [self.view addSubview:self.toolbar];
+    if (!_browserOptions.hidetoolbar) {
+        [self.view addSubview:self.toolbar];
+    }
+
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
 }
@@ -1045,6 +1048,7 @@
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
         self.transparentbg = NO;
+        self.hidetoolbar = NO;
     }
 
     return self;
