@@ -551,13 +551,19 @@
     [self.view sendSubviewToBack:self.webView];
 
     self.webView.delegate = _webViewDelegate;
-    self.webView.backgroundColor = [UIColor whiteColor];
+
+    if (_browserOptions.transparentbg) { // Set toolbar color if user sets it in options
+        self.webView.backgroundColor = [UIColor clearColor];
+        self.webView.opaque = NO;
+    } else {
+        self.webView.backgroundColor = [UIColor whiteColor];
+        self.webView.opaque = YES;
+    }
 
     self.webView.clearsContextBeforeDrawing = YES;
     self.webView.clipsToBounds = YES;
     self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.multipleTouchEnabled = YES;
-    self.webView.opaque = YES;
     self.webView.scalesPageToFit = NO;
     self.webView.userInteractionEnabled = YES;
 
@@ -661,7 +667,12 @@
       [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
 
-    self.view.backgroundColor = [UIColor grayColor];
+    if (_browserOptions.transparentbg) { // Set toolbar color if user sets it in options
+        self.view.backgroundColor = [UIColor clearColor];
+    } else {
+        self.view.backgroundColor = [UIColor grayColor];
+    }
+
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
@@ -1033,6 +1044,7 @@
         self.closebuttoncolor = nil;
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
+        self.transparentbg = NO;
     }
 
     return self;

@@ -105,6 +105,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HIDE_URL = "hideurlbar";
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
+    private static final String TRANSPARENT_BG = "transparentbg";
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
@@ -133,6 +134,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
+    private boolean useTransparentBackground = false;
     private String[] allowedSchemes;
 
     /**
@@ -628,6 +630,11 @@ public class InAppBrowser extends CordovaPlugin {
             if (footerColorSet != null) {
                 footerColor = footerColorSet;
             }
+
+            String transparentBG = features.get(TRANSPARENT_BG);
+            if (transparentBG != null) {
+                useTransparentBackground = transparentBG.equals("yes") ? true : false;
+            }                
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -709,6 +716,11 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
+	
+                if (useTransparentBackground) {
+                    dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    dialog.getWindow().getDecorView().setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                }                
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
@@ -835,6 +847,11 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView = new WebView(cordova.getActivity());
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
+
+                if (useTransparentBackground) {
+                    inAppWebView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                }
+
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     // For Android 5.0+
