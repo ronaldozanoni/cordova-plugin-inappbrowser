@@ -154,6 +154,7 @@
         }
         self.inAppBrowserViewController = [[CDVInAppBrowserViewController alloc] initWithUserAgent:userAgent prevUserAgent:[self.commandDelegate userAgent] browserOptions: browserOptions];
         self.inAppBrowserViewController.navigationDelegate = self;
+        self.inAppBrowserViewController.transparentbg = browserOptions.transparentbg;
 
         if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
             self.inAppBrowserViewController.orientationDelegate = (UIViewController <CDVScreenOrientationDelegate>*)self.viewController;
@@ -228,11 +229,13 @@
 
     _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
 
-    __block CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
-                                   initWithRootViewController:self.inAppBrowserViewController];
+    __block CDVInAppBrowserNavigationController* nav = [CDVInAppBrowserNavigationController alloc];
     nav.orientationDelegate = self.inAppBrowserViewController;
+    nav.transparentbg = self.inAppBrowserViewController.transparentbg;
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
+    
+    nav = [nav initWithRootViewController:self.inAppBrowserViewController];
 
     __weak CDVInAppBrowser* weakSelf = self;
 
@@ -542,7 +545,13 @@
 
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
+
+    if (_browserOptions.location) {
+        webViewBounds.size.height -= FOOTER_HEIGHT;
+    } else if (!_browserOptions.hidetoolbar) {
+        webViewBounds.size.height -= TOOLBAR_HEIGHT;
+    }
+
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
@@ -611,6 +620,9 @@
     if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
       self.toolbar.translucent = NO;
     }
+    if (_browserOptions.hidetoolbar) {
+        self.toolbar.hidden = YES;
+    }
 
     CGFloat labelInset = 5.0;
     float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
@@ -673,7 +685,7 @@
         self.view.backgroundColor = [UIColor grayColor];
     }
 
-    if (!_browserOptions.hidetoolbar) {
+    if (!self.toolbar.hidden) {
         [self.view addSubview:self.toolbar];
     }
 
@@ -1110,7 +1122,10 @@
     UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:statusBarFrame];
     bgToolbar.barStyle = UIBarStyleDefault;
     [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [self.view addSubview:bgToolbar];
+
+    if (!self.transparentbg) {
+        [self.view addSubview:bgToolbar];
+    }
 
     [super viewDidLoad];
 }
