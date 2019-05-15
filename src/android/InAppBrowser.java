@@ -711,20 +711,27 @@ public class InAppBrowser extends CordovaPlugin {
                 };
 
                 // Let's create the main dialog
-                dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
-                dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+                if (useTransparentBackground) {
+                    dialog = new InAppBrowserDialog(cordova.getActivity(), cordova.getActivity().getResources().getIdentifier("DialogTransparent", "style", cordova.getActivity().getPackageName()));
+                    dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    dialog.getWindow().getDecorView().setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                } else {
+                    dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
+                    dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+                }                
+
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
-                dialog.setInAppBroswer(getInAppBrowser());
-	
-                if (useTransparentBackground) {
-                    dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-                    dialog.getWindow().getDecorView().setBackgroundColor(android.graphics.Color.TRANSPARENT);
-                }                
+                dialog.setInAppBroswer(getInAppBrowser());                
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
                 main.setOrientation(LinearLayout.VERTICAL);
+
+                if (useTransparentBackground) {
+                    main.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                }
 
                 // Toolbar layout
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
@@ -961,6 +968,10 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Add our webview to our main view/layout
                 RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
+                if (useTransparentBackground) {
+                    webViewLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                }
+                
                 webViewLayout.addView(inAppWebView);
                 main.addView(webViewLayout);
 
