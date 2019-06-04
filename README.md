@@ -152,6 +152,9 @@ instance, or the system browser.
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
     - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
 
+    Android supports these additional options:
+    - __destroywebview__: set to `yes` to destroy the Webview when exiting the InAppBrowser.  Default value is `no`.
+
     Windows supports these additional options:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.

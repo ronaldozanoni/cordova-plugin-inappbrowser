@@ -106,11 +106,13 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
     private static final String TRANSPARENT_BG = "transparentbg";
+    private static final String DESTROY_WEBVIEW = "destroywebview";
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
+    private RelativeLayout webViewLayout;
     private EditText edittext;
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
@@ -135,6 +137,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean showFooter = false;
     private String footerColor = "";
     private boolean useTransparentBackground = false;
+    private boolean shouldDestroyWebview = false;
     private String[] allowedSchemes;
 
     /**
@@ -457,19 +460,28 @@ public class InAppBrowser extends CordovaPlugin {
                     return;
                 }
 
-                childView.setWebViewClient(new WebViewClient() {
-                    // NB: wait for about:blank before dismissing
-                    public void onPageFinished(WebView view, String url) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                            dialog = null;
+                if (shouldDestroyWebview) {
+                    dialog.dismiss();
+
+                    webViewLayout.removeView(inAppWebView);
+                    childView.destroy();                            
+                    inAppWebView = null;
+                    dialog = null;                    
+                } else {
+                    childView.setWebViewClient(new WebViewClient() {
+                        // NB: wait for about:blank before dismissing
+                        public void onPageFinished(WebView view, String url) {
+                            if (dialog != null) {
+                                dialog.dismiss();
+                                dialog = null;
+                            }
                         }
-                    }
-                });
-                // NB: From SDK 19: "If you call methods on WebView from any thread
-                // other than your app's UI thread, it can cause unexpected results."
-                // http://developer.android.com/guide/webapps/migrating.html#Threads
-                childView.loadUrl("about:blank");
+                    });
+                    // NB: From SDK 19: "If you call methods on WebView from any thread
+                    // other than your app's UI thread, it can cause unexpected results."
+                    // http://developer.android.com/guide/webapps/migrating.html#Threads
+                    childView.loadUrl("about:blank");
+                }
 
                 try {
                     JSONObject obj = new JSONObject();
@@ -634,7 +646,12 @@ public class InAppBrowser extends CordovaPlugin {
             String transparentBG = features.get(TRANSPARENT_BG);
             if (transparentBG != null) {
                 useTransparentBackground = transparentBG.equals("yes") ? true : false;
-            }                
+            }
+
+            String forceDestroyWebview = features.get(DESTROY_WEBVIEW);
+            if (forceDestroyWebview != null) {
+                shouldDestroyWebview = forceDestroyWebview.equals("yes") ? true : false;
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -968,7 +985,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 // Add our webview to our main view/layout
-                RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
+                webViewLayout = new RelativeLayout(cordova.getActivity());
                 if (useTransparentBackground) {
                     webViewLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                 }
