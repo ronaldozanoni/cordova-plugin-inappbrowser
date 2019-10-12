@@ -797,14 +797,12 @@ public class InAppBrowser extends CordovaPlugin {
                 if (useTransparentBackground) {
                     dialog = new InAppBrowserDialog(cordova.getActivity(), cordova.getActivity().getResources().getIdentifier("DialogTransparent", "style", cordova.getActivity().getPackageName()));
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
                     dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                     dialog.getWindow().getDecorView().setBackgroundColor(android.graphics.Color.TRANSPARENT);
                 } else {
                     dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 }                
 
